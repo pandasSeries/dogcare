@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 1 mapper 엘리먼트의 『namespace = "패키지 경로가 포함된 인터페이스"』 속성 추가 -->
+<!-- 인터페이스 내부에 메소드명이 구성되어 있어야 한다.(→메소드 선언) -->
+<!-- 인터페이스의 메소드명과 『id="식별자"』 가 일치해야 한다. -->
+<mapper namespace="com.fin.prj.dao.IMyDogListDAO">
+	<!-- 예시 -->
+	<select id="list" resultType="com.fin.prj.dto.MyDogListDTO"> <!-- dao.count() 이렇게 쓸 수 있다. -->
+		SELECT D.DOG_CD, D.DOG_NAME
+		FROM DOG D, MEMDOG M
+		WHERE D.DOG_CD =
+		M.DOG_CD
+		AND M.MEM_CD = #{memCd}
+		AND MEMDOG_EXIT_DATE IS NULL
+		ORDER BY MEMDOG_REG_DATE
+	</select>
+
+	<select id="doginfo" resultType="com.fin.prj.dto.MyDogListDTO">
+		SELECT
+		DOG_NAME, TRUNC((SYSDATE-D.DOG_BIRTH)/365,0) + 1 AGE, DOG_REG,
+		DOG_WEIGHT, ACTI_LV, SIZ, BREED,
+		NVL(DSS_NAME,'미정'), SPL_NAME, FEED_NAME, FOO_HABIT, NVL(PIC_PATH,'미정') PIC_PATH,D.DOG_CD
+		DOG_CD
+		FROM
+		DOG D
+		LEFT JOIN
+		MY_DSS MD ON D.DOG_CD = MD.DOG_CD
+		LEFT JOIN
+		DSS ON DSS.DSS_CD = MD.DSS_CD
+		LEFT JOIN
+		MY_SPL MS ON MS.DOG_CD = D.DOG_CD
+		LEFT JOIN
+		SPL S ON S.SPL_CD = MS.SPL_CD
+		LEFT JOIN
+		MY_FEED MF ON MF.DOG_CD = D.DOG_CD
+		LEFT JOIN
+		FEED F ON F.FEED_CD = MF.FEED_CD
+		LEFT JOIN
+		ACTI A ON A.ACTI_CD = D.ACTI_CD
+		LEFT JOIN
+		SIZ ON SIZ.SIZ_CD = D.SIZ_CD
+		LEFT JOIN
+		BREED ON BREED.BREED_CD = D.BREED_CD
+		LEFT JOIN
+		FOO ON FOO.FOO_CD = D.FOO_CD
+		LEFT JOIN
+		PROFILE_PIC PP ON PP.DOG_CD = D.DOG_CD
+		LEFT JOIN
+		PIC ON PIC.PIC_CD = PP.PIC_CD
+		WHERE D.DOG_CD = #{dog_cd}
+	</select>
+
+	<select id="cltime" resultType="com.fin.prj.dto.MyDogListDTO">
+		SELECT S.MEM_CD MEM_CD , S.DOG_CD
+		DOG_CD ,S.CL_DATE CL_DATE, S.CL_NEXT_VISIT CL_NEXT_VISIT
+		FROM
+		(
+		SELECT M.MEM_CD, MD.DOG_CD, CL.CL_DATE, CL.CL_NEXT_VISIT,
+		ROW_NUMBER() OVER (PARTITION BY MD.DOG_CD ORDER BY CL.CL_DATE DESC) AS RNUM
+		FROM MEM M
+		JOIN MEMDOG MD ON M.MEM_CD = MD.MEM_CD
+		JOIN CL ON CL.MEMDOG_CD = MD.MEMDOG_CD
+		WHERE MD.DOG_CD = #{dog_cd}
+		) S
+		WHERE RNUM = 1
+	</select>
+
+	<select id="memdoglist"
+		resultType="com.fin.prj.dto.MyDogListDTO">
+		SELECT MI.NAME
+		FROM DOG D, MEMDOG MD,MEM M,MEM_INFO MI
+		WHERE
+		D.DOG_CD = MD.DOG_CD
+		AND D.DOG_CD = #{dog_cd}
+		AND M.MEM_CD = MD.MEM_CD
+		AND M.MEM_CD = MI.MEM_CD
+	</select>
+
+	<select id="mempicList" resultType="map">
+		SELECT DOG_NAME,
+		DOG_CD,TO_CHAR(DOG.DOG_REG, 'YYYY-MM-DD') DOG_REG,
+		PIC_PATH, NAME
+		FROM
+		MEMDOG
+		JOIN DOG ON DOG.DOG_CD
+		= MEMDOG.DOG_CD
+		JOIN PROFILE_PIC PP ON
+		PP.DOG_CD = MEMDOG.DOG_CD
+		JOIN PIC ON PIC.PIC_CD = PP.PIC_CD
+		JOIN
+		MEM_INFO MI ON MI.MEM_CD = MEMDOG.MEM_CD
+		WHERE DOG.MEM_CD= #{memCd}
+	</select>
+
+	<select id="memdogCd" resultType="java.lang.String">
+		SELECT MEMDOG_CD
+		FROM MEMDOG MD
+		JOIN MEM M ON M.MEM_CD = MD.MEM_CD
+		JOIN DOG D ON D.DOG_CD = MD.DOG_CD
+		WHERE M.MEM_CD=#{memCd} AND D.DOG_CD=#{dog_cd}
+	</select>
+
+
+</mapper>

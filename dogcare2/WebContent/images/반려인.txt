@@ -1,0 +1,63 @@
+반려인
+
+    마이페이지 - 반려견 관리
+            반려견 등록 
+                DOG 
+                반려견정보코드 - 자동 
+                     견종 코드 - select BREED -> select option
+                     회원코드 - 마이페이지 -> 값 받기
+                     배변코드 - select FOO -> radio
+                     활동코드 - select ACTI -> radio
+                     크기코드 - select SIZ -> radio
+                     이름 - text
+                     생년월일 - 캘린더
+                     비밀번호 - text
+                     무게 - text
+                     등록날짜 - (sysdate)생략
+                MY_DSS
+                    내강병코드 - 자동
+                    반려견 등록코드 -  자동
+                    병코드 - select DSS -> option
+                    등록일자 - 생략
+                MY_SPL
+                    DOG_CD - 자동 입력안함
+                    SPL_CD1 - SELECT SPL -> option
+                    SPL_CD2 - 
+                    SPL_CD3 - 
+                    LS_SPL_DATE - sysdate
+                MY_FEED
+                    DOG_CD - 자동
+                    FEED_CD1 - SELECT FEED -> option
+                    FEED_CD2
+                    FEED_CD3
+                    FEED_REG_DATE -  sysdate
+                MEMDOG 
+                    MEMDOG_CD
+                    DOG_CD 
+                    MEM_CD
+                    MEMDOG_REG_DATE - sysdate
+                PIC 등록후
+                    PIC_CD
+                    MEM_CD
+                    PIC_PATH - 파일 올리기
+                    PIC_DATE - sysdate
+                PROFILE_PIC
+                    PROFILE_CD
+                    PIC_CD
+                    DOG_CD
+                    PROFILE_WR_DATE - sysdate
+                    
+            반려견 관리
+		조회
+                회원코드, 반려견정보 반려
+                의뢰할반려견리스트, 펫시팅의뢰,
+                펫시팅지원,매칭된업무 조인
+                SELECT DOG.이름, DOG.등록날짜, 누적일지 COUNT(매칭된업무),  
+                 
+                 정보보기 - 반려견에 대한 상세 정보
+                    선호하는 사료, 선호하는 영양제, 내 강아지 병력, 반려견 프로필 사진, 반려견 정보, 반려 조인
+                    
+                    WHERE DOG_CD = '사용자가 클릭한 강아지'
+		삭제 반려견정보, 반려테이블에서 삭제
+		
+                    

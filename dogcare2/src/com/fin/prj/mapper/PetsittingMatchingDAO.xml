@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fin.prj.dao.IPetsittingMatchingDAO">
+
+<select id="searchSCd" resultType="java.lang.String">
+	SELECT S.S_CD
+	FROM MEM M, S_APPLY SA, RES R, S
+	WHERE M.MEM_CD = SA.MEM_CD AND SA.S_APPLY_CD = R.S_APPLY_CD
+	AND R.RES_CD = S.RES_CD
+	AND M.MEM_CD = #{memCd}
+</select>
+
+<insert id="petsittingApply">
+	INSERT INTO PETSITTING_APPLY(SITTING_APPLY_CD, POST_CD, S_CD)
+	VALUES('PAPPLY'||PETSITTING_APPLY_SEQ.NEXTVAL, #{postCd, jdbcType=VARCHAR}, #{sCd, jdbcType=VARCHAR})
+</insert>
+
+<select id="searchApplyCd" resultType="java.lang.String">
+	SELECT SITTING_APPLY_CD
+	FROM PETSITTING_APPLY
+	WHERE POST_CD = #{postCd}
+	AND S_CD = #{sCd}
+</select>
+
+<select id="calPerformMoney" resultType="java.lang.Integer">
+	SELECT DISTINCT (S.H_PAY * PR.WORK_TIME) AS MONEY
+	FROM PETSITTING_REQ PR, PETSITTING_APPLY PA, S
+	WHERE PR.POST_CD = PA.POST_CD AND S.S_CD = PA.S_CD
+	AND PR.POST_CD = #{postCd}
+	AND S.S_CD = #{sCd}
+</select>
+
+<insert id="selectPetsitter">
+	INSERT INTO PERFORM(PERFORM_CD, SITTING_APPLY_CD, PERFORM_MONEY)
+	VALUES('PERFORM'||PERFORM_SEQ.NEXTVAL, #{applyCd, jdbcType=VARCHAR}, #{money})
+</insert>
+
+</mapper>

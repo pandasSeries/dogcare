@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fin.prj.dao.IApplyPetsittingFormDAO">
+
+<select id="myDogList" resultType="com.fin.prj.dto.MyDogListDTO">
+	SELECT M.MEMDOG_CD, D.DOG_CD, D.DOG_NAME
+	FROM DOG D, MEMDOG M
+	WHERE D.DOG_CD = M.DOG_CD
+	AND M.MEM_CD = #{memCd}
+	AND MEMDOG_EXIT_DATE IS NULL
+	ORDER BY MEMDOG_REG_DATE
+</select>
+
+<select id="searchMemInfo" resultType="com.fin.prj.dto.MemInfoDTO">
+	SELECT ZONECODE, CLASS1, CLASS2, CLASS3, ADDR_DETAIL
+	FROM MEM_INFO
+	WHERE MEM_CD=#{memCd}
+</select>
+
+<select id="reqList" resultType="com.fin.prj.dto.ReqTyDTO">
+	SELECT REQ_TY_CD, REQ_TY
+	FROM REQ_TY
+	ORDER BY REQ_TY_CD
+</select>
+
+</mapper>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fin.prj.dao.IOmrDAO">
+
+<insert id="insertOmr">
+	INSERT INTO OMR (OMR_CD, TTP_CD, MK1, MK2, MK3, MK4, MK5, MK6, MK7, MK8, MK9,MK10)
+	VALUES('OMR'||OMR_SEQ.nextval,#{dto.ttp_cd}, #{dto.mk1},#{dto.mk2},#{dto.mk3},#{dto.mk4},#{dto.mk5},#{dto.mk6}
+	,#{dto.mk7},#{dto.mk8},#{dto.mk9},#{dto.mk10} )
+</insert>
+
+<select id="selectA" resultType="com.fin.prj.dto.TtpDTO">
+SELECT
+    MAX(CASE WHEN RNUM = 1 THEN A END) AS A_NUM1,
+    MAX(CASE WHEN RNUM = 2 THEN A END) AS A_NUM2,
+    MAX(CASE WHEN RNUM = 3 THEN A END) AS A_NUM3,
+    MAX(CASE WHEN RNUM = 4 THEN A END) AS A_NUM4,
+    MAX(CASE WHEN RNUM = 5 THEN A END) AS A_NUM5,
+    MAX(CASE WHEN RNUM = 6 THEN A END) AS A_NUM6,
+    MAX(CASE WHEN RNUM = 7 THEN A END) AS A_NUM7,
+    MAX(CASE WHEN RNUM = 8 THEN A END) AS A_NUM8,
+    MAX(CASE WHEN RNUM = 9 THEN A END) AS A_NUM9,
+    MAX(CASE WHEN RNUM = 10 THEN A END) AS A_NUM10
+FROM (
+    SELECT Q.A, ROWNUM AS RNUM
+    FROM TTP
+    JOIN Q ON Q.Q_NUM IN (TTP.Q_NUM1, TTP.Q_NUM2, TTP.Q_NUM3, TTP.Q_NUM4, TTP.Q_NUM5, 
+                          TTP.Q_NUM6, TTP.Q_NUM7, TTP.Q_NUM8, TTP.Q_NUM9, TTP.Q_NUM10)
+    WHERE TTP.S_CD = 'S1'
+    AND TTP.TTP_DATE = (SELECT MAX(TTP_DATE) FROM TTP)
+)
+</select>
+
+
+<select id="checkScore" resultType="java.lang.Integer">
+
+SELECT COUNT(CASE WHEN A.A IN (O.MK1, O.MK2, O.MK3, O.MK4, O.MK5, O.MK6, O.MK7, O.MK8, O.MK9, O.MK10) THEN 1 END)*10 AS POINT
+FROM 
+(
+    SELECT Q.A, O.OMR_CD
+    FROM OMR O, TTP T, Q
+    WHERE Q.Q_NUM IN (T.Q_NUM1, T.Q_NUM2, T.Q_NUM3, T.Q_NUM4, T.Q_NUM5, T.Q_NUM6, T.Q_NUM7, T.Q_NUM8, T.Q_NUM9, T.Q_NUM10)
+    AND T.TTP_CD = O.TTP_CD
+    AND O.OMR_DATE = (SELECT MAX(O.OMR_DATE)
+                      FROM OMR O, TTP T
+                      WHERE O.TTP_CD = T.TTP_CD
+                      AND T.S_CD = 'S2')
+) A, OMR O
+WHERE O.OMR_CD = A.OMR_CD
+
+</select>
+
+
+</mapper>

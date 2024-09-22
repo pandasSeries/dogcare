@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fin.prj.dao.IRegisterExtraInfoDAO">
+
+<!-- week -->
+<select id="week" resultType="com.fin.prj.dto.WeekDTO">
+	SELECT WEEK_CD, WEEK
+	FROM WEEK
+</select>
+
+<!-- size -->
+<select id="size" resultType="com.fin.prj.dto.SizDTO">
+	SELECT SIZ_CD, SIZ
+	FROM SIZ
+</select>
+
+<!-- lcs -->
+<select id="lcs" resultType="com.fin.prj.dto.LcsDTO">
+	SELECT LCS_CD, LCS_TY, LCS_NAME, REG_NUM, LCS_MAN
+	FROM LCS
+</select>
+
+<select id="searchResCd" resultType="java.lang.String">
+	SELECT R.RES_CD 
+	FROM MEM M, S_APPLY SA, RES R
+	WHERE M.MEM_CD = SA.MEM_CD AND SA.S_APPLY_CD = R.S_APPLY_CD
+	AND M.MEM_CD = #{memCd}
+	AND R.RES = 'Y'
+</select>
+
+<insert id="insertPetsitter">
+	INSERT INTO S(S_CD, RES_CD, GR_CD, SMOKE_YN, H_PAY)
+	VALUES('S'||S_SEQ.NEXTVAL, #{dto.res_cd}, 'GR3', #{dto.smoke_yn}, 0)
+</insert>
+
+<select id="searchSCd" resultType="java.lang.String">
+	SELECT S.S_CD
+	FROM MEM M, S_APPLY SA, RES R, S
+	WHERE M.MEM_CD = SA.MEM_CD AND SA.S_APPLY_CD = R.S_APPLY_CD
+	AND R.RES_CD = S.RES_CD
+	AND M.MEM_CD = #{memCd}
+</select>
+
+<insert id="insertWeek">
+	INSERT INTO WORK_DAY(WORK_DAY_CD, S_CD, WEEK_CD)
+	VALUES('WDAY'||WORK_DAY_SEQ.NEXTVAL, #{sCd}, #{weekCd})
+</insert>
+
+</mapper>

@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- mapper엘리먼트의 namespace="패키지 경로가 포함된 인터페이스" 속성 추가 -->
+<!-- 인터페이스 내부에 메서드 명이 구성되어있어야 한다(메서드 선언) -->
+<!-- 인터페이스 메서드명과 id="식별자"가 일치해야한다 -->
+<mapper namespace="com.fin.prj.dao.IDogDAO">
+
+
+	<!-- 액션 처리 유형에 해당하는 엘리먼트 구성 -->
+	<!-- id="식별자" 속성 추가 인터페이스에 정의된 메서드의 이름과 일치해야하며 호출 메서드명 역할 수행 resultType="패키지 
+		경로가 포함된 자료형 클래스" 속성 추가 SELECT 쿼리 내부에 있는 칼럼의 이름 정보가 자료형 클래스의 멤버변수와 일치하는 경우 
+		자동 매핑이 이루어진다 select는 리턴타입 필요 -->
+	<select id="breedList" resultType="com.fin.prj.dto.BreedDTO">
+		SELECT *
+		FROM BREED
+	</select>
+
+	<select id="fooList" resultType="com.fin.prj.dto.FooDTO">
+		SELECT *
+		FROM FOO
+	</select>
+
+	<select id="actiList" resultType="com.fin.prj.dto.ActiDTO">
+		SELECT *
+		FROM ACTI
+	</select>
+
+	<select id="sizList" resultType="com.fin.prj.dto.SizDTO">
+		SELECT *
+		FROM SIZ
+	</select>
+
+	<select id="dssList" resultType="com.fin.prj.dto.DssDTO">
+		SELECT *
+		FROM DSS
+	</select>
+
+	<select id="splList" resultType="com.fin.prj.dto.SplDTO">
+		SELECT *
+		FROM SPL
+	</select>
+
+	<select id="spltyList" resultType="com.fin.prj.dto.SplTyDTO">
+		SELECT *
+		FROM SPL_TY
+	</select>
+
+	<select id="feedList" resultType="com.fin.prj.dto.FeedDTO">
+		SELECT *
+		FROM FEED
+	</select>
+
+	<insert id="dogInsert">
+		INSERT INTO DOG(DOG_CD, MEM_CD, BREED_CD, DOG_NAME,
+		DOG_BIRTH, DOG_PASS, DOG_WEIGHT, FOO_CD, ACTI_CD, SIZ_CD, DOG_REG)
+		VALUES('DOG'||DOG_SEQ.NEXTVAL,#{mem_cd}, #{map.breed_cd},
+		#{map.dog_name},
+		#{map.dog_birth}, #{map.dog_pass}, #{map.dog_weight},
+		#{map.foo_cd}, #{map.acti_cd},
+		#{map.siz_cd}, SYSDATE )
+	</insert>
+
+	<insert id="my_spl_Insert">
+		INSERT INTO MY_SPL
+		(MY_SPL_CD,
+		SPL_CD,
+		DOG_CD,
+		SPL_CD2,
+		SPL_CD3,
+		LS_SPL_DATE)
+		VALUES('MSPL'||MY_SPL_SEQ.NEXTVAL,#{spl_cd1},
+		#{id}, #{spl_cd2}, #{spl_cd3}, SYSDATE )
+	</insert>
+
+	<insert id="my_feed_Insert">
+		INSERT INTO MY_FEED(MY_FEED_CD,
+		DOG_CD,
+		FEED_CD,
+		FEED_CD2,
+		FEED_CD3,
+		FEED_REG_DATE
+		)
+		VALUES('MFEED'||MY_FEED_SEQ.NEXTVAL,
+		#{id}, #{feed_cd1}, #{feed_cd2},
+		#{feed_cd3}, SYSDATE )
+	</insert>
+
+	<insert id="my_dss_Insert">
+		INSERT INTO MY_DSS
+		(
+		MY_DSS_CD,
+		DSS_CD,
+		DOG_CD,
+		DSS_REG_DATE
+		)
+		VALUES('MDSS'||MY_DSS_SEQ.NEXTVAL, #{disease_cd1},
+		#{id},
+		SYSDATE )
+	</insert>
+
+	<insert id="picInsert">
+		INSERT INTO PIC
+		(PIC_CD,
+		MEM_CD,
+		PIC_PATH,
+		PIC_DATE)
+		VALUES('PIC'||PIC_SEQ.NEXTVAL, #{mem_cd}, #{map.filePath}, SYSDATE)
+	</insert>
+
+	<insert id="profile_picInsert">
+		INSERT INTO PROFILE_PIC
+		(
+		PROFILE_CD,
+		PIC_CD,
+		DOG_CD,
+		PROFILE_WR_DATE
+		)
+		VALUES('PROFILE_PIC'||PROFILE_PIC_SEQ.NEXTVAL, #{pid},
+		#{id}, SYSDATE
+		)
+
+	</insert>
+
+	<select id="searchId" resultType="java.lang.String">
+		SELECT
+		'DOG'||MAX(TO_NUMBER(SUBSTR(DOG_CD, 4)))DOG_CD
+		FROM DOG
+		WHERE MEM_CD =
+		#{mem_cd}
+	</select>
+
+	<select id="searchPic" resultType="java.lang.String">
+		SELECT
+		'PIC'||MAX(TO_NUMBER(SUBSTR(PIC_CD, 4)))PIC_CD
+		FROM PIC
+		WHERE MEM_CD =
+		#{mem_cd}
+	</select>
+
+	<select id="dogList" resultType="map">
+		SELECT DOG.DOG_CD, DOG.DOG_NAME,
+		TO_CHAR(DOG.DOG_REG, 'YYYY-MM-DD') DOG_REG, PIC.PIC_PATH, NAME
+		FROM DOG
+		JOIN
+		MEM ON MEM.MEM_CD = DOG.MEM_CD
+		JOIN PROFILE_PIC ON
+		PROFILE_PIC.DOG_CD =
+		DOG.DOG_CD
+		JOIN PIC ON PIC.PIC_CD =
+		PROFILE_PIC.PIC_CD
+		JOIN MEM_INFO MI ON MI.MEM_CD = MEM.MEM_CD
+		WHERE
+		MEM.MEM_CD=#{mem_cd}
+
+	</select>
+
+	<select id="dogSubList" resultType="map">
+		SELECT
+
+		TO_CHAR(D.DOG_BIRTH,
+		'YYYY-MM-DD') AS DOG_BIRTH,
+		D.*,
+		MD.*,
+		DSS.*,
+		MS.*,
+		S.*,
+		MF.*,
+		F.*,
+		A.*,
+		SIZ.*,
+		BREED.*,
+		FOO.*,
+		PP.*,
+		PIC.PIC_PATH AS P
+		FROM
+		DOG D
+		JOIN MY_DSS MD ON
+		D.DOG_CD =
+		MD.DOG_CD
+		JOIN DSS ON DSS.DSS_CD = MD.DSS_CD
+		JOIN MY_SPL MS ON
+		MD.DOG_CD
+		= D.DOG_CD
+		JOIN SPL S ON S.SPL_CD = MS.SPL_CD
+		JOIN MY_FEED MF
+		ON
+		MF.DOG_CD = D.DOG_CD
+		JOIN FEED F ON F.FEED_CD = MF.FEED_CD
+		JOIN ACTI A
+		ON A.ACTI_CD = D.ACTI_CD
+		JOIN SIZ ON SIZ.SIZ_CD = D.SIZ_CD
+		JOIN BREED ON
+		BREED.BREED_CD = D.BREED_CD
+		JOIN FOO ON FOO.FOO_CD = D.FOO_CD
+		JOIN
+		PROFILE_PIC PP ON PP.DOG_CD = D.DOG_CD
+		JOIN PIC ON PIC.PIC_CD =
+		PP.PIC_CD
+		WHERE
+		D.DOG_CD = #{dog_cd}
+		AND MS.DOG_CD = #{dog_cd}
+		AND
+		MF.DOG_CD = #{dog_cd}
+	</select>
+
+	<update id="dogUpdate">
+		UPDATE DOG SET BREED_CD=#{breed_cd},
+		DOG_NAME=#{dog_name},
+		DOG_BIRTH=#{dog_birth}, DOG_PASS=#{dog_pass},
+		DOG_WEIGHT=#{dog_weight},
+		FOO_CD=#{foo_cd}, ACTI_CD=#{acti_cd},
+		SIZ_CD=#{siz_cd}
+		WHERE DOG_CD = #{dog_cd}
+	</update>
+
+
+	<update id="my_spl_Update">
+		UPDATE MY_SPL
+		SET SPL_CD=#{spl_cd1},
+		SPL_CD2=#{spl_cd2}, SPL_CD3=#{spl_cd3}
+		WHERE DOG_CD=#{dog_cd}
+	</update>
+
+	<update id="my_feed_Update">
+		UPDATE MY_FEED
+		SET
+		FEED_CD=#{feed_cd1},
+		FEED_CD2=#{feed_cd2},
+		FEED_CD3=#{feed_cd3}
+		WHERE DOG_CD=#{dog_cd}
+
+	</update>
+
+	<update id="my_dss_Update">
+		UPDATE MY_DSS
+		SET
+		DSS_CD=#{disease_cd1}
+		WHERE
+		DOG_CD=#{dog_cd}
+
+	</update>
+
+
+	<insert id="memDogInsert">
+		INSERT INTO MEMDOG
+		(
+		MEMDOG_CD,
+		DOG_CD,
+		MEM_CD,
+		MEMDOG_REG_DATE,
+		MEMDOG_EXIT_DATE
+		)
+		VALUES
+		(
+		'MEMDOG'||MEMDOG_SEQ.NEXTVAL,
+		#{map.id},
+		#{mem_cd},
+		SYSDATE,
+		NULL
+
+		)
+	</insert>
+
+	<delete id="dogDelete">
+		DELETE
+		FROM DOG
+		WHERE DOG_CD=#{dog_cd}
+	</delete>
+
+	<delete id="memDogDelete">
+		DELETE
+		FROM MEMDOG
+		WHERE DOG_CD=#{dog_cd}
+	</delete>
+
+	<delete id="profile_picDelete">
+		DELETE
+		FROM PROFILE_PIC
+		WHERE DOG_CD=#{dog_cd}
+	</delete>
+
+	<delete id="my_spl_Delete">
+		DELETE
+		FROM MY_SPL
+		WHERE DOG_CD=#{dog_cd}
+	</delete>
+
+	<delete id="my_dss_Delete">
+		DELETE
+		FROM MY_DSS
+		WHERE DOG_CD=#{dog_cd}
+	</delete>
+
+	<delete id="my_feed_Delete">
+		DELETE
+		FROM MY_FEED
+		WHERE DOG_CD=#{dog_cd}
+	</delete>
+
+	<select id="my_spl_cd_Search" resultType="map">
+		SELECT SPL_NAME,
+		SPL_BRAND
+		FROM MY_SPL MS
+		JOIN SPL S ON MS.SPL_CD = S.SPL_CD
+		WHERE DOG_CD
+		= #{dog_cd}
+	</select>
+
+	<select id="my_spl_cd2_Search" resultType="map">
+		SELECT SPL_NAME,
+		SPL_BRAND
+		FROM MY_SPL MS
+		JOIN SPL S ON MS.SPL_CD2 = S.SPL_CD
+		WHERE DOG_CD
+		= #{dog_cd}
+	</select>
+
+	<select id="my_spl_cd3_Search" resultType="map">
+		SELECT SPL_NAME,
+		SPL_BRAND
+		FROM MY_SPL MS
+		JOIN SPL S ON MS.SPL_CD3 = S.SPL_CD
+		WHERE DOG_CD
+		= #{dog_cd}
+	</select>
+
+	<select id="my_dss_Search" resultType="map">
+		SELECT *
+		FROM MY_DSS MD
+		JOIN DSS D ON MD.DSS_CD = D.DSS_CD
+		WHERE DOG_CD = #{dog_cd}
+	</select>
+
+	<select id="my_feed_Search" resultType="map">
+		SELECT *
+		FROM MY_FEED MF
+		JOIN FEED F ON MF.FEED_CD = F.FEED_CD
+		WHERE DOG_CD = #{dog_cd}
+		UNION ALL
+		SELECT *
+		FROM MY_FEED MF
+		JOIN FEED F ON MF.FEED_CD2 = F.FEED_CD
+		WHERE
+		DOG_CD = #{dog_cd}
+		UNION ALL
+		SELECT *
+		FROM MY_FEED MF
+		JOIN FEED F ON
+		MF.FEED_CD3 = F.FEED_CD
+		WHERE DOG_CD = #{dog_cd}
+	</select>
+
+	<select id="dogCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM DOG WHERE
+		MEM_CD=#{mem_cd}
+	</select>
+
+	<insert id="memDogSearchInsert">
+		INSERT INTO MEMDOG
+		VALUES('MEMDOG'||MEMDOG_SEQ.NEXTVAL, #{map.dog_cd}, #{mem_cd},
+		SYSDATE, NULL)
+	</insert>
+
+	<select id="memDogSearch" resultType="java.lang.Integer">
+		SELECT
+		COUNT(DOG.DOG_CD)
+		FROM MEMDOG
+		JOIN DOG ON DOG.DOG_CD = MEMDOG.DOG_CD
+		WHERE DOG.DOG_PASS =
+		#{dog_pass}
+		AND DOG.DOG_CD = #{dog_cd}
+	</select>
+
+	<select id="memDogList" resultType="map">
+		SELECT DOG_NAME,
+		DOG_CD,TO_CHAR(DOG.DOG_REG, 'YYYY-MM-DD') DOG_REG,
+		PIC_PATH, NAME
+		FROM
+		MEMDOG
+		JOIN DOG ON DOG.DOG_CD
+		= MEMDOG.DOG_CD
+		JOIN PROFILE_PIC PP ON
+		PP.DOG_CD = MEMDOG.DOG_CD
+		JOIN PIC ON PIC.PIC_CD = PP.PIC_CD
+		JOIN MEM_INFO MI ON MI.MEM_CD = DOG.MEM_CD
+		WHERE MEMDOG.MEM_CD=#{mem_cd}
+	</select>
+	<select id="memDogCount" resultType="java.lang.Integer">
+		SELECT COUNT(*) MEMDOGCOUNT
+		FROM MEMDOG
+		WHERE DOG_CD =
+		#{map.dog_cd} AND MEM_CD = #{mem_cd}
+	</select>
+
+	<select id="profileSearch" resultType="java.lang.String">
+		SELECT PIC_CD FROM PROFILE_PIC WHERE DOG_CD=#{dog_cd}
+	</select>
+
+	<update id="picUpdate">
+
+		UPDATE PIC SET PIC_PATH = #{map.filePath} WHERE PIC_CD = #{pid}
+
+	</update>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

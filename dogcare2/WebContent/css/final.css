@@ -1,0 +1,111 @@
+@charset "UTF-8";
+
+@font-face 
+{
+    font-family: 'Cafe24Ssurround';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/Cafe24Ssurround.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+	font-family: 'Pretendard';
+	font-weight: 900;
+	font-display: swap;
+	src: local('Pretendard Black'), url(../fonts/woff2/Pretendard-Black.woff2) format('woff2'), url(../fonts/woff/Pretendard-Black.woff) format('woff');
+}
+
+@font-face {
+	font-family: 'Pretendard';
+	font-weight: 800;
+	font-display: swap;
+	src: local('Pretendard ExtraBold'), url(../fonts/woff2/Pretendard-ExtraBold.woff2) format('woff2'), url(../fonts/woff/Pretendard-ExtraBold.woff) format('woff');
+}
+
+@font-face {
+	font-family: 'Pretendard';
+	font-weight: 700;
+	font-display: swap;
+	src: local('Pretendard Bold'), url(../fonts/woff2/Pretendard-Bold.woff2) format('woff2'), url(../fonts/woff/Pretendard-Bold.woff) format('woff');
+}
+
+@font-face {
+	font-family: 'Pretendard';
+	font-weight: 600;
+	font-display: swap;
+	src: local('Pretendard SemiBold'), url(../fonts/woff2/Pretendard-SemiBold.woff2) format('woff2'), url(../fonts/woff/Pretendard-SemiBold.woff) format('woff');
+}
+
+@font-face {
+	font-family: 'Pretendard';
+	font-weight: 500;
+	font-display: swap;
+	src: local('Pretendard Medium'), url(../fonts/woff2/Pretendard-Medium.woff2) format('woff2'), url(../fonts/woff/Pretendard-Medium.woff) format('woff');
+}
+
+@font-face {
+	font-family: 'Pretendard';
+	font-weight: 400;
+	font-display: swap;
+	src: local('Pretendard Regular'), url(../fonts/woff2/Pretendard-Regular.woff2) format('woff2'), url(../fonts/woff/Pretendard-Regular.woff) format('woff');
+}
+
+@font-face {
+	font-family: 'Pretendard';
+	font-weight: 300;
+	font-display: swap;
+	src: local('Pretendard Light'), url(../fonts/woff2/Pretendard-Light.woff2) format('woff2'), url(../fonts/woff/Pretendard-Light.woff) format('woff');
+}
+
+@font-face {
+	font-family: 'Pretendard';
+	font-weight: 200;
+	font-display: swap;
+	src: local('Pretendard ExtraLight'), url(../fonts/woff2/Pretendard-ExtraLight.woff2) format('woff2'), url(../fonts/woff/Pretendard-ExtraLight.woff) format('woff');
+}
+
+@font-face {
+	font-family: 'Pretendard';
+	font-weight: 100;
+	font-display: swap;
+	src: local('Pretendard Thin'), url(../fonts/woff2/Pretendard-Thin.woff2) format('woff2'), url(../fonts/woff/Pretendard-Thin.woff) format('woff');
+}
+
+
+#tab
+{
+	font-family: 'Cafe24Ssurround';
+}
+.main
+{
+	font-family: 'Pretendard';
+	font-weight: 400;
+	
+	position: relative; /* 추가된 코드 */
+	background-color: white;
+}
+.main::before 
+{
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 7px; /* 그림자의 높이 */
+    background: linear-gradient(to bottom, rgba(5, 5, 5, 0.1), rgba(0, 0, 0, 0)); /* 위쪽에만 그림자 */
+	pointer-events: none; /* 요소에 클릭 등 이벤트가 영향을 주지 않도록 설정 */
+}
+a
+{
+	text-decoration: none;
+	color: black;
+}
+
+#tab a
+{
+   font-size: 20pt; 
+   margin-left: 50px;
+}
+#tab a:hover
+{
+   text-decoration: underline;
+}

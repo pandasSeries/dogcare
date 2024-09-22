@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fin.prj.dao.IPetsittingListDAO">
+
+<select id="listAll" resultType="com.fin.prj.dto.PetsittingListDTO">
+	SELECT PR.POST_CD, D.DOG_NAME, PR.CLASS1, PR.CLASS2, PR.WORK_DATE, PR.WORK_TIME
+     , (CASE WHEN L.MEMDOG_CD_1 IS NOT NULL THEN 1 ELSE 0 END +
+        CASE WHEN L.MEMDOG_CD_2 IS NOT NULL THEN 1 ELSE 0 END +
+        CASE WHEN L.MEMDOG_CD_3 IS NOT NULL THEN 1 ELSE 0 END) AS DOG_COUNT
+	FROM DOG D, MEMDOG M, DOG_LIST L, PETSITTING_REQ PR
+	WHERE D.DOG_CD = M.DOG_CD AND M.MEMDOG_CD = L.MEMDOG_CD_1
+  	  AND L.LIST_CD = PR.LIST_CD AND SYSDATE <![CDATA[ < ]]> WORK_DATE - 1
+	ORDER BY POST_DATE DESC
+</select>
+
+
+
+<select  id="petsittingList" resultType="map">
+	SELECT *
+	FROM PETSITTING_REQ PR
+	JOIN DOG_LIST DL ON PR.LIST_CD = DL.LIST_CD
+	LEFT JOIN MEMDOG M ON M.MEMDOG_CD = DL.MEMDOG_CD_1
+	LEFT JOIN DOG D ON D.DOG_CD = M.DOG_CD
+	LEFT JOIN PROFILE_PIC PP ON PP.DOG_CD = D.DOG_CD
+	LEFT JOIN PIC P ON P.PIC_CD = PP.PIC_CD
+	ORDER BY POST_DATE DESC
+</select>
+
+</mapper>

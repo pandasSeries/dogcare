@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fin.prj.dao.IPerformDAO">
+
+	<insert id="picInsert">
+		INSERT INTO PIC
+		(
+			PIC_CD,
+			MEM_CD,
+			PIC_PATH,
+			PIC_DATE
+		)
+		VALUES('PIC'||PIC_SEQ.NEXTVAL, #{mem_cd}, #{map.filePath}, SYSDATE)
+	</insert>
+
+	<select id="searchPic" resultType="java.lang.String">
+		SELECT
+		'PIC'||MAX(TO_NUMBER(SUBSTR(PIC_CD, 4)))PIC_CD
+		FROM PIC
+		WHERE MEM_CD =
+		#{mem_cd}
+	</select>
+	
+	<insert id="performedPicInsert">
+		INSERT INTO PERFORMED_PIC VALUES('PP'||PERFORMED_PIC_SEQ.NEXTVAL, 'PERFORM6', #{pid}, SYSDATE, #{applytext})
+	</insert>
+	
+	<select id="performedPicList" resultType="com.fin.prj.dto.PerformedPicDTO">
+		SELECT PP.PERFORMED_PIC_CD, PP.PERFORM_CD, PP.PIC_CD, PP.PIC_MEMO, PP.PERFORMED_PIC_DATE, P.PIC_PATH
+		FROM PERFORMED_PIC PP, MEM M, PIC P
+		WHERE  M.MEM_CD = P.MEM_CD AND P.PIC_CD = PP.PIC_CD
+		AND M.MEM_CD = #{memCd}
+        AND PP.PERFORM_CD = #{performCd}
+		ORDER BY PP.PERFORMED_PIC_DATE
+	</select>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

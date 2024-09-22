@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fin.prj.dao.IMyPerformListDAO">
+
+<select id="PerformList" resultType="com.fin.prj.dto.PerformInfoDTO">
+	SELECT PR.WORK_DATE, P.PERFORM_CD
+	FROM MEM M, S_APPLY SA, RES R, S, PETSITTING_REQ PR, PETSITTING_APPLY PA, PERFORM P
+	WHERE M.MEM_CD = SA.MEM_CD AND SA.S_APPLY_CD = R.S_APPLY_CD AND R.RES_CD = S.RES_CD
+	AND S.S_CD = PA.S_CD AND PA.POST_CD = PR.POST_CD AND PA.SITTING_APPLY_CD = P.SITTING_APPLY_CD
+	AND M.MEM_CD = #{memCd}
+</select>
+
+</mapper>

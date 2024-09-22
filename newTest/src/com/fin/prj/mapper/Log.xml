@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+ <!-- 1 mapper 엘리먼트의 『namespace = "패키지 경로가 포함된 인터페이스"』 속성 추가 -->
+ <!-- 인터페이스 내부에 메소드명이 구성되어 있어야 한다.(→메소드 선언) -->
+ <!-- 인터페이스의 메소드명과 『id="식별자"』 가 일치해야 한다. -->
+<mapper namespace="com.fin.prj.dao.ILogDAO">
+	<!-- 
+		01. 사료 셀렉트박스에 리스트업할 쿼리문[사료이름]
+		02. 사료 list
+		03. 사료 insert
+		04. 사료 delete
+		
+		05. 영양제 셀렉트박스에 리스트업 할 쿼리문 [종류, 영양제]
+		06. 영양제 list
+		07. 영양제 insert
+		08. 영양제 delete
+		
+		09. 간식 list
+		10. 간식 insert
+		11. 간식 delete  
+		
+		12. 산책 list
+		13. 산책 insert
+		14. 산책 delete
+		
+		
+		16. 목욕 insert
+		17. 목욕 delete
+		
+		18. 특이사항 list
+		19. 특이사항 insert
+		20. 특이사항 update
+		21. 특이사항 delete
+		
+		22. 사진 list(1)??
+		23. 사진 insert
+		24. 사진 delete
+		
+		25. 일기 list
+		26. 일기 insert
+		27. 일기 update
+		28. 일기 delete
+		
+		20. 일괄등록 할 수 있게 가장 각 테이블마다 가장 최근에 먹인 '사료' '영양제' '간식' '산책' 조회해서 플레이스 홀더로 넣어두기 
+	-->
+	
+	<!-- feed -->
+	<select id="foodselect" resultType="com.fin.prj.dto.LogDTO"> <!-- dao.count() 이렇게 쓸 수 있다. -->
+		SELECT FEED_NAME
+		FROM FEED
+	</select>
+		
+	
+	<select id="foodlist" resultType="com.fin.prj.dto.LogDTO">
+		SELECT FD_CD, MD.MEMDOG_CD MEMDOG_CD, FD.FEED_CD, FD_AMOUNT, TO_CHAR(FD_DATE,'HH24:MI:SS') FD_DATE, FD_WR_DATE, MD.MEM_CD MEM_CD, FEED_NAME
+		FROM FD FD, MEMDOG MD,FEED F
+		WHERE FD.MEMDOG_CD = MD.MEMDOG_CD
+		AND FD.FEED_CD = F.FEED_CD
+		AND MD.DOG_CD ='DOG2'									
+		<!-- AND TO_DATE(FD_DATE,'YYYY-MM-DD') = TO_DATE(#{selected_date, jdbcType=DATE},'YYYY-MM-DD') -->
+		<!-- AND TRUNC(FD_DATE,'DD') = TO_DATE(#{selected_date, jdbcType=DATE},'YYYY-MM-DD') -->
+		AND TO_CHAR(FD_DATE, 'YYYY-MM-DD') = #{selected_date}
+		<!-- AND TO_CHAR(FD_DATE,'YYYY-MM-DD) = TO_CHAR(selected_date,'YYYY-MM-DD') -->
+		ORDER BY FD.FD_CD
+	</select>
+	
+	<insert id="foodadd">
+    	INSERT INTO FD(FD_CD, MEMDOG_CD, FEED_CD, FD_AMOUNT, FD_DATE, FD_WR_DATE) 
+    	VALUES('FD'||FD_SEQ.NEXTVAL, 'MEMDOG2', 
+        (SELECT FEED_CD FROM FEED WHERE FEED_NAME = #{feed_name}), 
+        #{fd_amount}, TO_DATE(#{selected_date, jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'), SYSDATE)
+	</insert>
+	
+	<delete id="fooddelete">
+		DELETE
+		FROM FD
+		WHERE FD_CD = #{fd_cd}
+	</delete>
+	
+	
+	
+	
+	
+	
+	
+	<select id="splselect" resultType="com.fin.prj.dto.LogDTO">
+		SELECT SPL_NAME
+		FROM SPL
+	</select>
+	
+	<select id="spllist" resultType="com.fin.prj.dto.LogDTO">
+		SELECT ST.SPL_TAKE_CD SPL_TAKE_CD, MD.MEMDOG_CD MEMDOG_CD, S.SPL_CD SPL_CD, SPL_TAKE_DATE,DOG_CD, MEM_CD, S.SPL_TY_CD, S.SPL_NAME, S.SPL_BRAND
+		FROM SPL_TAKE ST, MEMDOG MD,SPL S
+		WHERE ST.MEMDOG_CD = MD.MEMDOG_CD
+		AND ST.SPL_CD = S.SPL_CD
+		AND MD.DOG_CD ='DOG2'
+		AND TO_CHAR(SPL_TAKE_DATE, 'YYYY-MM-DD') = #{selected_date}
+		ORDER BY ST.SPL_CD
+	</select>
+	
+	<insert id="spladd" >
+		INSERT INTO SPL_TAKE(SPL_TAKE_CD, MEMDOG_CD, SPL_CD, SPL_TAKE_DATE, SPL_TAKE_WR_DATE) 
+		VALUES('STAKE'||SPL_TAKE_SEQ.NEXTVAL, 'MEMDOG2'
+			, (SELECT SPL_CD FROM SPL WHERE SPL_NAME = #{spl_name})
+			, TO_DATE(#{selected_date, jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),SYSDATE)
+	</insert>
+	
+	<delete id="spldelete">
+		DELETE
+		FROM SPL_TAKE
+		WHERE SPL_TAKE_CD = #{spllist.spl_take_cd}
+	</delete>
+	
+	
+	
+	<select id="snacklist" resultType="com.fin.prj.dto.LogDTO">
+		SELECT SNACK_CD, MD.MEMDOG_CD,SNACK_NAME, SNACK_AMOUNT, SNACK_DATE, SNACK_WR_DATE
+		FROM SNACK SN,MEMDOG MD
+		WHERE SN.MEMDOG_CD = MD.MEMDOG_CD
+		AND MD.DOG_CD = 'DOG2'
+		AND TO_CHAR(SNACK_DATE, 'YYYY-MM-DD') = #{selected_date}
+		ORDER BY SN.SNACK_CD
+	</select>
+	
+	<insert id="snackadd" >
+		INSERT INTO SNACK(SNACK_CD, MEMDOG_CD, SNACK_NAME,SNACK_AMOUNT, SNACK_DATE, SNACK_WR_DATE) 
+		VALUES('SNACK'||SNACK_SEQ.NEXTVAL, 'MEMDOG2'
+			, #{snack_name}, #{snack_amount}
+			, TO_DATE(#{selected_date, jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'),SYSDATE)
+	</insert>
+	
+	<delete id="snackdelete">
+		DELETE
+		FROM SNACK
+		WHERE SNACK_CD = #{snacklist.snack_cd}
+	</delete>
+	
+	
+	
+	
+	
+
+	
+	<select id="walklist" resultType="com.fin.prj.dto.LogDTO">
+		SELECT WALK_CD, MD.MEMDOG_CD, WALK_START_DATE AS walk_start_date, WALK_END_DATE AS walk_end_date, WALK_WR_DATE, DOG_CD,MEM_CD
+		FROM WALK SN,MEMDOG MD
+		WHERE SN.MEMDOG_CD = MD.MEMDOG_CD
+		AND MD.DOG_CD = 'DOG2'
+		AND TO_CHAR(WALK_START_DATE, 'YYYY-MM-DD') = #{selected_date}
+		ORDER BY SN.WALK_START_DATE
+	</select>
+	
+	<insert id="walkadd" >
+		INSERT INTO WALK(WALK_CD,MEMDOG_CD,WALK_START_DATE,WALK_END_DATE,WALK_WR_DATE) 
+		VALUES('WALK'||WALK_SEQ.NEXTVAL,'MEMDOG2',TO_DATE(#{walk_start_date, jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS')
+		,TO_DATE(#{walk_end_date, jdbcType=DATE},'YYYY-MM-DD HH24:MI:SS'), SYSDATE)
+	</insert>
+	
+	<delete id="walkdelete">
+		DELETE
+		FROM WALK
+		WHERE WALK_CD = #{walklist.walk_cd}
+	</delete>
+	
+	
+	<!-- bathlist 쿼리 -->
+	<select id="bathlist" resultType="java.lang.String">
+	    SELECT TO_CHAR(B.BATH_DATE, 'YYYY-MM-DD') AS BATH_DATE
+	    FROM BATH B
+	    JOIN MEMDOG MD ON B.MEMDOG_CD = MD.MEMDOG_CD
+	    WHERE MD.DOG_CD = 'DOG2'
+	    AND TO_CHAR(B.BATH_DATE, 'YYYY-MM-DD') = #{selected_date}
+	</select>
+	
+	<insert id="bathadd">
+	    INSERT INTO BATH (BATH_CD, MEMDOG_CD, BATH_DATE, BATH_WR_DATE)
+	    VALUES ('BATH'||BATH_SEQ.NEXTVAL, 'MEMDOG2', TO_DATE(#{bath_date, jdbcType=DATE}, 'YYYY-MM-DD HH24:MI:SS'), SYSDATE)
+	</insert>	
+	
+	<select id="bathcheck" >
+		SELECT COUNT(*)
+		FROM BATH B,MEMDOG MD
+		WHERE B.MEMDOG_CD = MD.MEMDOG_CD
+		AND MD.DOG_CD = 'DOG2'
+		AND TO_CHAR(BATH_DATE, 'YYYY-MM-DD') = #{selected_date}
+	</select>
+	
+	<select id="speclist" resultType="com.fin.prj.dto.LogDTO">
+		SELECT SPEC_CD, MD.MEMDOG_CD, SPEC_CONTENT, SPEC_DATE, SPEC_WR_DATE
+		FROM SPEC S,MEMDOG MD
+		WHERE S.MEMDOG_CD = MD.MEMDOG_CD
+		AND MD.DOG_CD = 'DOG2'
+		AND TO_CHAR(SPEC_DATE, 'YYYY-MM-DD') = #{selected_date}
+		ORDER BY S.SPEC_CD
+	</select>
+	
+	<insert id="specadd">
+		INSERT INTO SPEC(SPEC_CD, MEMDOG_CD ,SPEC_CONTENT, SPEC_DATE, SPEC_WR_DATE) 
+		VALUES('SPEC'||SPEC_SEQ.NEXTVAL,'MEMDOG2',#{spec_content},TO_DATE(#{selected_date, jdbcType=DATE},'YYYY-MM-DD'), SYSDATE)
+	</insert>
+	
+	<update id="specupdate">
+		UPDATE SPEC 
+		SET SPEC_CONTENT = #{spec_content}
+		WHERE SPEC_CD = #{spec_cd}
+	</update>
+	
+	
+	
+	
+	
+	
+		
+	
+	 
+	
+	
+	
+</mapper>

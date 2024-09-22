@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fin.prj.dao.IApplicationContentDAO">
+
+<select id="dogList" resultType="com.fin.prj.dto.DogDTO">
+	SELECT D.DOG_NAME, B.BREED, EXTRACT(YEAR FROM SYSDATE) - EXTRACT(YEAR FROM D.DOG_BIRTH) AS AGE
+	FROM DOG D, BREED B, MEMDOG M, DOG_LIST L, PETSITTING_REQ PR
+	WHERE D.BREED_CD = B.BREED_CD AND D.DOG_CD = M.DOG_CD 
+	AND M.MEMDOG_CD IN (L.MEMDOG_CD_1, L.MEMDOG_CD_2, L.MEMDOG_CD_3)
+	AND L.LIST_CD = PR.LIST_CD
+	AND PR.POST_CD = #{postCd}
+</select>
+
+<select id="petsittingReqContent" resultType="com.fin.prj.dto.PetsittingReqDTO">
+	SELECT CLASS1, CLASS2, CLASS3, WORK_DATE, WORK_TIME, CF
+	FROM PETSITTING_REQ
+	WHERE POST_CD = #{postCd}
+</select>
+
+<select id="reqList" resultType="com.fin.prj.dto.ReqTyDTO">
+	SELECT RT.REQ_TY
+	FROM PETSITTING_REQ PR, REQ R, REQ_TY RT
+	WHERE PR.POST_CD = R.POST_CD AND R.REQ_TY_CD = RT.REQ_TY_CD
+	AND PR.POST_CD = #{postCd}
+</select>
+
+<select id="petsitterList" resultType="com.fin.prj.dto.PetsitterInfoDTO">
+	SELECT S.S_CD, MI.NAME, GR.GR, S.H_PAY, SA.EXP_YN, PA.SITTING_APPLY_CD
+		 , CASE WHEN SUBSTR(MI.SSN2, 1, 1) IN ('1', '3') THEN '남' 
+	            WHEN SUBSTR(MI.SSN2, 1, 1) IN ('2', '4') THEN '여'
+	            ELSE '확인필요'
+	            END AS GENDER 
+	     , CASE WHEN SUBSTR(MI.SSN2, 1, 1) IN ('1', '2') THEN EXTRACT(YEAR FROM SYSDATE) - (1899 + TO_NUMBER(SUBSTR(MI.SSN1, 1, 2))) 
+	            WHEN SUBSTR(MI.SSN2, 1, 1) IN ('3', '4') THEN EXTRACT(YEAR FROM SYSDATE) - (1999 + TO_NUMBER(SUBSTR(MI.SSN1, 1, 2)))
+	            ELSE -1
+	            END AS AGE
+	FROM S, RES R, S_APPLY SA, MEM M, MEM_INFO MI, GR, PETSITTING_APPLY PA
+	WHERE M.MEM_CD = MI.MEM_CD AND M.MEM_CD = SA.MEM_CD
+	AND SA.S_APPLY_CD = R.S_APPLY_CD AND S.RES_CD = R.RES_CD
+	AND S.GR_CD = GR.GR_CD AND PA.S_CD = S.S_CD
+	AND PA.POST_CD = #{postCd}
+</select>
+
+<select id="petsitterInfo" resultType="com.fin.prj.dto.PetsitterInfoDTO">
+	SELECT S.S_CD, MI.NAME, GR.GR, S.H_PAY, SA.EXP_YN
+		 , CASE WHEN SUBSTR(MI.SSN2, 1, 1) IN ('1', '3') THEN '남' 
+	            WHEN SUBSTR(MI.SSN2, 1, 1) IN ('2', '4') THEN '여'
+	            ELSE '확인필요'
+	            END AS GENDER 
+	     , CASE WHEN SUBSTR(MI.SSN2, 1, 1) IN ('1', '2') THEN EXTRACT(YEAR FROM SYSDATE) - (1899 + TO_NUMBER(SUBSTR(MI.SSN1, 1, 2))) 
+	            WHEN SUBSTR(MI.SSN2, 1, 1) IN ('3', '4') THEN EXTRACT(YEAR FROM SYSDATE) - (1999 + TO_NUMBER(SUBSTR(MI.SSN1, 1, 2)))
+	            ELSE -1
+	            END AS AGE
+	FROM S, RES R, S_APPLY SA, MEM M, MEM_INFO MI, GR
+	WHERE M.MEM_CD = MI.MEM_CD AND M.MEM_CD = SA.MEM_CD
+	AND SA.S_APPLY_CD = R.S_APPLY_CD AND S.RES_CD = R.RES_CD
+	AND S.GR_CD = GR.GR_CD
+	AND S.S_CD = #{sCd}
+</select>
+
+<select id="performCount" resultType="java.lang.Integer">
+	SELECT COUNT(*) AS PERFORM_COUNT
+	FROM PETSITTING_REQ PR, PETSITTING_APPLY PA, PERFORM P
+	WHERE PR.POST_CD = PA.POST_CD AND PA.SITTING_APPLY_CD = P.SITTING_APPLY_CD
+	AND PR.WORK_DATE <![CDATA[ < ]]> SYSDATE
+	AND PA.S_CD = #{sCd}
+</select>
+
+<select id="performCountDetail" resultType="com.fin.prj.dto.PetsitterInfoDTO">
+	SELECT COUNT(CASE WHEN Z.SIZ = '대' THEN 1 END) AS PERFORM_B_COUNT,
+	       COUNT(CASE WHEN Z.SIZ = '중' THEN 1 END) AS PERFORM_M_COUNT,
+	       COUNT(CASE WHEN Z.SIZ = '소' THEN 1 END) AS PERFORM_S_COUNT
+	FROM S, PETSITTING_APPLY PA, PERFORM P, PETSITTING_REQ PR, DOG_LIST L, MEMDOG M, DOG D, SIZ Z
+	WHERE S.S_CD = PA.S_CD AND PA.SITTING_APPLY_CD = P.SITTING_APPLY_CD
+	  AND PA.POST_CD = PR.POST_CD AND PR.LIST_CD = L.LIST_CD
+	  AND M.MEMDOG_CD IN (L.MEMDOG_CD_1, L.MEMDOG_CD_2, L.MEMDOG_CD_3)
+	  AND M.DOG_CD = D.DOG_CD AND D.SIZ_CD = Z.SIZ_CD
+	  AND PR.WORK_DATE <![CDATA[ < ]]> SYSDATE
+	  AND S.S_CD = #{sCd}
+</select>
+
+<select id="ratingAvg" resultType="java.lang.Double">
+	SELECT NVL(TRUNC(AVG(RATING), 1), 0) AS RATING_AVG
+	FROM PETSITTING_APPLY PA, PERFORM P, S_REVIEW S
+	WHERE PA.SITTING_APPLY_CD = P.SITTING_APPLY_CD
+	AND P.PERFORM_CD = S.PERFORM_CD
+	AND PA.S_CD = #{sCd}
+</select>
+
+<select id="review" resultType="com.fin.prj.dto.SReivewDTO">
+	SELECT R.RATING, R.REVIEW, R.REVIEW_DATE
+	FROM 
+	(   SELECT R.RATING, R.REVIEW, R.REVIEW_DATE
+    	FROM S, PETSITTING_APPLY PA, PERFORM P, S_REVIEW R
+    	WHERE S.S_CD = PA.S_CD AND PA.SITTING_APPLY_CD = P.SITTING_APPLY_CD
+      	AND P.PERFORM_CD = R.PERFORM_CD
+      	AND S.S_CD = #{sCd}
+    	ORDER BY R.REVIEW_DATE DESC) R
+	WHERE ROWNUM <![CDATA[ < ]]>= 3
+</select>
+
+<select id="lcsList" resultType="com.fin.prj.dto.LcsDTO">
+	SELECT L.LCS_CD, L.LCS_TY, L.LCS_NAME, L.REG_NUM, L.LCS_MAN
+	FROM S, OWN_LCS OL, LCS L
+	WHERE S.S_CD = OL.S_CD AND OL.LCS_CD = L.LCS_CD
+	AND S.S_CD = #{sCd}
+	ORDER BY OL.LCS_REG_DATE
+</select>
+
+<select id="searchWriter" resultType="java.lang.String">
+	SELECT DISTINCT M.MEM_CD
+	FROM MEM M, MEMDOG D, DOG_LIST L, PETSITTING_REQ PR
+	WHERE M.MEM_CD = D.MEM_CD AND D.MEMDOG_CD IN (L.MEMDOG_CD_1, L.MEMDOG_CD_2, L.MEMDOG_CD_3)
+	AND L.LIST_CD = PR.LIST_CD
+	AND PR.POST_CD = #{postCd}
+</select>
+
+<!-- 
+<select id="searchPerform" resultType="java.lang.Integer">
+	SELECT COUNT(*) AS COUNT
+	FROM PETSITTING_REQ PR, PETSITTING_APPLY PA, PERFORM P
+	WHERE PR.POST_CD = PA.POST_CD AND PA.SITTING_APPLY_CD = P.SITTING_APPLY_CD
+	AND PR.POST_CD = #{postCd}
+</select> 
+-->
+
+<select id="searchSelectedS" resultType="java.lang.String">	
+	SELECT PA.S_CD
+	FROM PETSITTING_REQ PR, PETSITTING_APPLY PA, PERFORM P
+	WHERE PR.POST_CD = PA.POST_CD AND PA.SITTING_APPLY_CD = P.SITTING_APPLY_CD
+	AND PR.POST_CD = #{postCd}
+</select>
+
+</mapper>

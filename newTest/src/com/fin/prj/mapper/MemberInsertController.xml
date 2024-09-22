@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fin.prj.dao.IMemberInsertDAO">
+
+	<insert id="newMemCd">
+		INSERT INTO MEM(MEM_CD)
+		VALUES ('MEM'||MEM_SEQ.NEXTVAL)
+	</insert>
+	
+	<select id="getMemCd" resultType="java.lang.String">
+		SELECT MEM_CD, MEM_REG_DATE
+		FROM MEM
+		WHERE MEM_REG_DATE = (SELECT MAX(MEM_REG_DATE)
+							  FROM MEM)
+	</select>
+	
+	<insert id="add">
+		INSERT INTO MEM_INFO
+		(MEM_INFO_CD, MEM_CD, NAME, EMAIL, PASSWORD, SSN1, SSN2, TELEPHONE
+		, ZONECODE, CLASS1, CLASS2, CLASS3, ADDR_DETAIL, CREATE_DATE)
+		VALUES
+		('MINFO'||MEM_INFO_SEQ.NEXTVAL, #{mem_cd}, #{name}, #{email}, #{password}, #{ssn1}, #{ssn2}, #{telephone}
+		, #{zonecode}, #{class1}, #{class2}, #{class3}, #{addr_detail}, SYSDATE)
+	</insert>
+	
+	
+
+</mapper>

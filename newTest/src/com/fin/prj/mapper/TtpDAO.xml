@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fin.prj.dao.ITtpDAO">
+
+ <select id="selectQ" resultType="com.fin.prj.dto.TtpDTO">
+ 		SELECT 
+           MAX(CASE WHEN ROWNUM = 1 THEN Q_NUM END) AS Q_NUM1,
+           MAX(CASE WHEN ROWNUM = 2 THEN Q_NUM END) AS Q_NUM2,
+           MAX(CASE WHEN ROWNUM = 3 THEN Q_NUM END) AS Q_NUM3,
+           MAX(CASE WHEN ROWNUM = 4 THEN Q_NUM END) AS Q_NUM4,
+           MAX(CASE WHEN ROWNUM = 5 THEN Q_NUM END) AS Q_NUM5,
+           MAX(CASE WHEN ROWNUM = 6 THEN Q_NUM END) AS Q_NUM6,
+           MAX(CASE WHEN ROWNUM = 7 THEN Q_NUM END) AS Q_NUM7,
+           MAX(CASE WHEN ROWNUM = 8 THEN Q_NUM END) AS Q_NUM8,
+           MAX(CASE WHEN ROWNUM = 9 THEN Q_NUM END) AS Q_NUM9,
+           MAX(CASE WHEN ROWNUM = 10 THEN Q_NUM END) AS Q_NUM10
+    FROM (SELECT Q_NUM FROM Q ORDER BY DBMS_RANDOM.VALUE)
+    WHERE ROWNUM <![CDATA[<]]>= 10
+ </select>
+ 
+ <insert id="insertQ">
+ 	INSERT INTO TTP (TTP_CD,Q_NUM1, Q_NUM2, Q_NUM3, Q_NUM4, Q_NUM5, Q_NUM6, Q_NUM7, Q_NUM8, Q_NUM9, Q_NUM10, S_CD)
+ 	VALUES('TTP'||TTP_SEQ.NEXTVAL
+ 	,#{dto.q_num1}, #{dto.q_num2}, #{dto.q_num3}, #{dto.q_num4}, #{dto.q_num5}
+ 	, #{dto.q_num6}, #{dto.q_num7}, #{dto.q_num8}, #{dto.q_num9}, #{dto.q_num10}, 'S2')
+ </insert>
+ 
+ <select id="showQ" resultType="com.fin.prj.dto.QDTO">
+	SELECT Q.Q, Q.A, Q.WRONG_1, Q.WRONG_2, Q.WRONG_3
+	FROM TTP, Q
+	WHERE Q.Q_NUM IN (TTP.Q_NUM1, TTP.Q_NUM2, TTP.Q_NUM3, TTP.Q_NUM4, TTP.Q_NUM5, TTP.Q_NUM6, TTP.Q_NUM7, TTP.Q_NUM8, TTP.Q_NUM9, TTP.Q_NUM10)
+    AND TTP_DATE = (SELECT MAX(TTP_DATE)
+					  FROM TTP)
+ </select>
+ 
+<select id="showA" resultType="com.fin.prj.dto.QDTO">
+	SELECT Q.A, Q.WRONG_1, Q.WRONG_2, Q.WRONG_3
+	FROM TTP, Q
+	WHERE Q.Q_NUM IN (TTP.Q_NUM1, TTP.Q_NUM2, TTP.Q_NUM3, TTP.Q_NUM4, TTP.Q_NUM5, TTP.Q_NUM6, TTP.Q_NUM7, TTP.Q_NUM8, TTP.Q_NUM9, TTP.Q_NUM10)
+    AND TTP_DATE = (SELECT MAX(TTP_DATE)
+					  FROM TTP)
+</select>
+
+<select id="showCd" resultType="java.lang.String">
+SELECT TTP_CD
+FROM TTP
+WHERE S_CD='S2' AND TTP_DATE = (SELECT MAX(TTP_DATE)
+					  FROM TTP)
+	
+</select>
+
+
+
+
+
+
+</mapper>
+
+
+

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+ <!-- 1 mapper 엘리먼트의 『namespace = "패키지 경로가 포함된 인터페이스"』 속성 추가 -->
+ <!-- 인터페이스 내부에 메소드명이 구성되어 있어야 한다.(→메소드 선언) -->
+ <!-- 인터페이스의 메소드명과 『id="식별자"』 가 일치해야 한다. -->
+<mapper namespace="com.fin.prj.dao.IDailyLogDAO">
+	<!-- 예시 -->
+	<select id="" resultType="java.lang.Integer"> <!-- dao.count() 이렇게 쓸 수 있다. -->
+		SELECT (SELECT FEED_NAME
+        FROM FEED
+        WHERE FEED_CD= F.FEED_CD) AS 사료이름,
+        F.FD_AMOUNT  AS 사료량
+		FROM FD F
+		WHERE TRUNC(FD_DATE,'DD')=TO_DATE(#{DATE}, 'YYYY-MM-DD')
+		AND   MEMDOG_CD IN(SELECT M.MEMDOG_CD
+                    FROM DOG D, MEMDOG M
+                    WHERE D.DOG_CD = M.DOG_CD 
+                    AND M.DOG_CD = #{DOG});
+	</select>
+	
+	
+
+</mapper>

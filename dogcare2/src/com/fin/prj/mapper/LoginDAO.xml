@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fin.prj.dao.ILoginDAO">
+
+<select id="login" resultType="java.lang.String">
+	SELECT M.MEM_CD
+	FROM MEM M, MEM_INFO MI
+	WHERE M.MEM_CD = MI.MEM_CD
+	AND MI.EMAIL = #{id}
+	AND MI.PASSWORD = #{pw}
+</select>
+
+<select id="searchMemdog" resultType="java.lang.Integer">
+	SELECT COUNT(*) AS COUNT
+	FROM MEM M, MEMDOG MD
+	WHERE M.MEM_CD = MD.MEM_CD
+	AND M.MEM_CD = #{memCd}
+</select>
+
+<select id="searchSApply" resultType="java.lang.String">
+	SELECT SA.S_APPLY_CD
+	FROM MEM M, S_APPLY SA
+	WHERE M.MEM_CD = SA.MEM_CD
+	AND S_APPLY_DATE = (SELECT MAX(S_APPLY_DATE)
+						FROM S_APPLY
+						WHERE MEM_CD = #{memCd})
+</select>
+
+<select id="searchRes" resultType="com.fin.prj.dto.ResDTO">
+	SELECT R.RES_CD, R.S_APPLY_CD, R.RES, R.RES_DATE
+	FROM S_APPLY SA, RES R
+	WHERE SA.S_APPLY_CD = R.S_APPLY_CD
+	AND SA.S_APPLY_CD = #{sApplyCd}
+</select>
+
+<select id="searchS" resultType="java.lang.String">
+	SELECT S.S_CD
+	FROM RES R, S
+	WHERE R.RES_CD = S.RES_CD
+	AND R.RES_CD = #{resCd}
+</select>
+
+</mapper>
